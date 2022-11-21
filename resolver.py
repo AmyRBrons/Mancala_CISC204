@@ -1,68 +1,45 @@
-import random
-#Sample of user input building script
+# Resolver file to play one round, small module functions per step/ action
+from board import buildBoard
 
-def buildBoard():
-    player =0
-    player1store = 0
-    player2store = 0
-    
-    pit1 = int(input('Please enter the number of gems in pit 1 (please note you only have 24 gems to split bewteen these 6 pits.)'))
-    Board[player][1] = pit1
-    pit2 = int(input('Please enter the number of gems in pit 2 (please note you only have', 24-pit1,'gems left)'))
-    Board[player][2] = pit2
-    pit3 = int(input('Please enter the number of gems in pit 3 (please note you only have', 24-pit1-pit2, 'gems left)'))
-    Board[player][1] = pit3
-    pit4 = int(input('Please enter the number of gems in pit 4 (please note you only have', 24-pit1-pit2-pit3,'gems left)'))
-    Board[player][2] = pit4
-    pit5 = int(input('Please enter the number of gems in pit 5 (please note you only have', 24-pit1-pit2-pit3-pit4, 'gems left)'))
-    Board[player][2] = pit5
-    pit6 = int(input('Please enter the number of gems in pit 6 (please note you only have', 24-pit1-pit2-pit3-pit4, 'gems left)'))
-    Board[player][1] = pit6
+# set the board
+Board = buildBoard()
 
-    player21 = random.randint(0,24)
-    player22range = 24 - player21
-    player22 = random.randint(0,player22range)
-    player23range = player22range-player22
-    player23 = random.randint(0,player23range)
-    player24range = player23range - player23
-    player24 = random.randint(0,player24range)
-    player25range = player24range - player24
-    player25 = random.randint(0, player25range)
-    player26 = player25range - player25
-    
-
-    Board = [[player1store,pit1,pit2,pit3,pit4,pit5,pit6],[player21,player22,player23,player24,player25range,player26,player2store]]
-    return Board
-
+# Set the player to the first player spot
 def PlayerSet(Board):
     playerRow = Board[0]
     return playerRow
 
+# Determine gems in pit
 def GemsinPit(Board, Row, Col):
     for Row in Board:
         for Col in Row:
             return Board[Row][Col]
-    
+
+# Detect if pit is empty
 def PitisEmpty(Board, Row, Col):
     if GemsinPit(Board,Row,Col)== 0:
         return True
     else:
         return False
 
+# Detect if opposite pit is empty
 def oppEmpty(Board, Col):
     playerRow = PlayerSet(Board)
-    oppRow = playerRow+1
+    oppRow = playerRow+1 # this is for possible changes, as opposed to just putting 1, more flexible
     if PitisEmpty(Board,oppRow,Col) == True:
         return True
     else: 
         return False
 
+# If the player can collect, return true
 def CanCollect(Board,Col,Row):
-    if (PitisEmpty(Board,Col,Row)==False) and (oppEmpty(Board,Col)==False):
+    # If the pit is empty and the opposite is not, return true
+    if (PitisEmpty(Board,Col,Row)==True) and (oppEmpty(Board,Col)==False):
         return True
     else:
         return False
 
+# Function to determine if the final piece lands in the player store
 def finalStore(board, player,n):
     gemsHand = board[player][n]
     point = n
@@ -95,10 +72,12 @@ def finalStore(board, player,n):
     else:
         return False
 
-        
-#def blockOpp(board):
+# function to determin if opponent can be blocked      
+#def blockOpp(board): -> Return Boolean
 
-
+# function to determin where last seed lands 
+# def landingPlaceRow -> Returns Row
+# def LandingPlaceCol -> Returns Col
 
 def pitDetermination(board, player):
     #1. Putting the final seed in the player store
@@ -106,18 +85,22 @@ def pitDetermination(board, player):
     #3. Put the player seed in the opponents empty pit
     #4. Empty the player pit
     #5. If all else fails, play the righmost pit.
+
+    row = landingPlaceRow(Board,player)
+    col = landingPlaceCol(Board,player)
+
     for player in board:
         for n in player:
             if finalStore(board,n) == True:
                 return n
             elif blockOpp(board, n) == True:
                 return n 
-            elif oppEmpty(board, n) == True:
+            elif (row == 1) and (PitisEmpty(board, row, col) == True):
                 return n
-            elif emptyPit(board, n) == True:
+            elif CanCollect(Board,n,row) == True:
                 return n
         else:
-            return 4
+            return 6
 
 def UserChoice():
     # in traditional set up, 48 stones are used. ie 24 per player, 6 per pit
