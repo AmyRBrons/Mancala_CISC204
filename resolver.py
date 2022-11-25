@@ -7,7 +7,7 @@ Board = buildBoard()
 # Set the player to the first player spot
 def PlayerSet(Board):
     playerRow = Board[0]
-    return playerRow
+    return playerRow # returns list of payer pits, ie: [store, 1,2,3,4,5,6]
 
 # Determine gems in pit
 def GemsinPit(Board, Row, Col):
