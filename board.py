@@ -3,10 +3,10 @@ import random
 
 # buildBoard function
 def buildBoard():
-    player =0
+    player = 0
     player1store = 0 # zero gems in the stores to start
     player2store = 0
-    
+    Board = [[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]]
     # Give the user allowance to fill pits with stones
     pit1 = int(input('Please enter the number of gems in pit 1 (please note you only have 24 gems to split bewteen these 6 pits.)'))
     Board[player][1] = pit1
@@ -37,4 +37,3 @@ def buildBoard():
     Board = [[player1store,pit1,pit2,pit3,pit4,pit5,pit6],[player21,player22,player23,player24,player25range,player26,player2store]]
     return Board
 
-buildBoard()
