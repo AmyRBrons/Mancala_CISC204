@@ -1,6 +1,11 @@
 # Resolver file to play one round, small module functions per step/ action
 from board import buildBoard
 
+# TO DO on this file:
+# landing place row and col functions
+# Kate to fininsh the pitdetermination function
+# blockopp function
+
 # set the board
 Board = buildBoard()
 
@@ -104,4 +109,4 @@ def pitDetermination(board, player):
 
 def UserChoice():
     # in traditional set up, 48 stones are used. ie 24 per player, 6 per pit
-    playInput = print("Player 1, it is suggested you grab from pit", pitDetermination(Board))
+    print("Player 1, it is suggested you grab from pit", pitDetermination(Board))
