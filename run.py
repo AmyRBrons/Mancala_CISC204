@@ -2,6 +2,7 @@ from pickle import TRUE
 from sqlite3 import Row
 from bauhaus import Encoding, proposition, constraint
 from bauhaus.utils import count_solutions, likelihood
+from board import buildBoard
 
 # Encoding that will store all of your constraints
 E = Encoding()
@@ -139,7 +140,7 @@ class FancyPropositions:
 
 # Call your variables whatever you want
 # Note: This is a 2d array which overlay the position. It goes like this:[[a0,a1,a2,a3,a4,a5,a6][b1,b2,b3,b4,b5,b6]] or b[r][c]
-originalGemList = []
+originalGemList = buildBoard()
 # Variables of the hand
 finalRow = 0
 finalColumn = 0
@@ -191,17 +192,13 @@ def constraints():
         for PitRow in ROW:
             for PitColumn in COLUMN:
                 Pit.append(PitProposition(PitRow,PitColumn,newGemList[PitRow-1][PitColumn]))
-        E.add_constraint(SelectPit(player+1, column) >> Pit & FinalSeed(finalRow, finalColumn))
             
 
     # Simulate the game rule: if the final seed lands on the player's store, that person may get another turn.
     for gems in GEMS:
         E.add_constraint(A >> FinalSeed(player+1, 0))
     # Simulate the game rule: if the final seed lands on an empty pit, the player collects gems from opposite pits.
-    for row in ROW:
-        for column in COLUMN:
-            if column != 0:
-                E.add_constraint(C >> FinalSeed(row,column) & PitProposition(row,column,1))
+    constraint.add_exactly_one(E, [C >> FinalSeed(row,column) & PitProposition(row,column,1) for row in ROW for column in COLUMN])
 
     return E
 
