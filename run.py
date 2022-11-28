@@ -10,7 +10,7 @@ E = Encoding()
 GEMS = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24} # Note: we should probably add a limit of 24 gems
 ROW = {1,2}
 COLUMN = {0,1,2,3,4,5,6}
-PIT = [ROW,COLUMN]
+PIT = [COLUMN,COLUMN]
 COLLECTS = TRUE
 OPPOSITE = TRUE
 
@@ -18,22 +18,23 @@ OPPOSITE = TRUE
 PROPOSITIONS = []
 
 
-# Proposition to check the position of the hand and how many gem it has
+# Proposition to check the position of the final seed
+@constraint.exactly_one(E)
 @proposition(E)
-class HandProposition:
-    def __init__(self, gems, pit):
-        self.gems = gems
-        self.pit = pit
+class FinalSeed:
+    def __init__(self, row, column):
+        self.row = row
+        self.column = column
 
     def __repr__(self):
-        return f"{self.gems}@{self.pit}"
+        return f"{self.row}@{self.column}"
 
-for pit in PIT:
-    for row in ROW:
-        for column in COLUMN:
-            PROPOSITIONS.append(HandProposition(pit,row))
+for row in ROW:
+    for column in COLUMN:
+        PROPOSITIONS.append(FinalSeed(row,column))
 
 # Proposition to check which pit is selected
+@constraint.exactly_one(E)
 @proposition(E)
 class SelectPit:
     def __init__(self, row, column):
@@ -137,14 +138,14 @@ class FancyPropositions:
         return f"A.{self.data}"
 
 # Call your variables whatever you want
-# Note: This is an array of gems taken from input. The index goes like this: pit a6 ... pit a0, pit b6 ... pit b0
-b = []
+# Note: This is a 2d array which overlay the position. It goes like this:[[a0,a1,a2,a3,a4,a5,a6][b1,b2,b3,b4,b5,b6]] or b[r][c]
+originalGemList = []
 # Variables of the hand
-r = 0
-c = 0
-g = b[14 - 7 * (r - 1) - c - 1]
+finalRow = 0
+finalColumn = 0
+gemCount = 0
 # Variable of the player
-p = 0
+player = 0
 # Special Outcomes
 A = PlayerTurnNext()
 C = PlayerCollects()
@@ -163,32 +164,44 @@ def constraints():
     """
     All of the game related constraints.
     """
-    # Simulate grabbing all of the gems in a pit
-    E.add_constraint(SelectPit(r,c) >> PitProposition(r, c, 0) & HandProposition(r,c,g))
-    # Simulate dropping of the gems (Comment: I just realize theres gonna a bug when a pit with 15 or more gems is selected rendering an unsatifiable board, I attempted to fix it, but who knows)
-    while (g != 0):
-        if r == (1 + p) and c == 0:
-            E.add_constraint(HandProposition(r,c,g) >> HandProposition(2-p,6,g-1) & PitProposition(2,6,b[6 + 7 * p]+1) & ~PitProposition(2,6,b[6+7*p]))
-            r = 2 - p
-            c = 6
-            b[6 + 7*p] = b[6 + 7*p]+1
-        if r == (2 - p) and c == 1:
-            E.add_constraint(HandProposition(r,c,g) >> HandProposition(1+p,6,g-1) & PitProposition(1+p,6,b[0 + 7*p]+1) & ~PitProposition(1+p,6,b[0 + 7*p]))
-            r = 1 + p
-            c = 6
-            b[0 + 7*p] = b[0 + 7*p]+1
-        else:
-            E.add_constraint(HandProposition(r,c,g) >> HandProposition(r,c-1,g-1) & PitProposition(r,c-1,b[14 - 7 * (r - 1) - c - 1] + 1) & ~PitProposition(r,c-1,b[14 - 7 * (r - 1) - c - 1]))
-            c = c - 1
-            b[14 - 7 * (r - 1) - c - 1] = b[14 - 7 * (r - 1) - c - 1] + 1
-        g = g - 1
+    # Simulate what happens if you select a pit
+    for column in COLUMN:
+        newGemList = originalGemList.copy()
+        finalRow = player
+        finalColumn = column
+        gemCount = originalGemList[finalRow][finalColumn]
+        newGemList[finalRow][finalColumn] = 0
+        while gemCount != 0:
+            # Move the hand to the opponent's row after dropping a gem in the bank
+            if finalColumn == 0 and finalRow == player:
+                finalColumn = 6
+                if player == 0:
+                    finalRow = 1
+                else:
+                    finalRow = 0
+            # Skip the opponent bank
+            elif finalColumn == 1 and finalRow != player:
+                finalColumn = 6
+                finalRow = player
+            else:
+                finalColumn = finalColumn - 1
+            newGemList[finalRow][finalColumn] = newGemList[finalRow][finalColumn] + 1
+        Pit = []
+        # Put the final state of the board in the logic.
+        for PitRow in ROW:
+            for PitColumn in COLUMN:
+                Pit.append(PitProposition(PitRow,PitColumn,newGemList[PitRow-1][PitColumn]))
+        E.add_constraint(SelectPit(player+1, column) >> Pit & FinalSeed(finalRow, finalColumn))
+            
 
     # Simulate the game rule: if the final seed lands on the player's store, that person may get another turn.
     for gems in GEMS:
-        E.add_constraint(HandProposition(p+1,0,gems) >> A)
+        E.add_constraint(A >> FinalSeed(player+1, 0))
     # Simulate the game rule: if the final seed lands on an empty pit, the player collects gems from opposite pits.
-    if c != 0:
-        E.add_constraint(HandProposition(r,c,0) & PitProposition(r,c,1) >> C)
+    for row in ROW:
+        for column in COLUMN:
+            if column != 0:
+                E.add_constraint(C >> FinalSeed(row,column) & PitProposition(row,column,1))
 
     return E
 
