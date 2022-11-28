@@ -1,4 +1,7 @@
 
+""" THIS FILE IS DISCONTINUED//WILL BE REPLACED BY RUN.PY
+IN FINAL--Kept for reference/ temp version control
+
 from pickle import TRUE
 from sqlite3 import Row
 from bauhaus import Encoding, proposition, constraint
@@ -184,7 +187,7 @@ for hand in Hand:
                     PROPOSITIONS.append(PlayerPicks(PIT, Player1banks, Player2bank, GEMS, Hand))
 
 #class GemsHand:"""
-
+"""
 # Call your variables whatever you want
 h = pitGems(Player,GEMS,PIT)
 s = PlayerTurn(Player)   
@@ -238,3 +241,4 @@ if __name__ == "__main__":
         #print(" %s: %.2f" % (vn, likelihood(T, v)))
         print(" %s: %f" % (vn, likelihood(T, v)))
     print()
+"""

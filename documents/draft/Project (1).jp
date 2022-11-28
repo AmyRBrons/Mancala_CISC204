@@ -1,0 +1,40 @@
+﻿CONJECTUREPANEL Quiz
+CURRENTPROOF "Sa1, Sa1→H4a1, H4a1→H3a0∧P1a0, H3a0→H2b6∧P3b6, H2b6→H1b5∧P1b5, H1b5→H0b4∧P1b4, Sb6, Sb6→H3b6, H3b6→H2b5∧P2b5, H2b5→H1b4∧P2b4, H1b4→H0b3∧P1b3, (H0b4∧P1b4)→C ⊢ Sb6→¬C"
+INFER Sa1,
+     Sa1→H4a1,
+     H4a1→H3a0∧P1a0,
+     H3a0→H2b6∧P3b6,
+     H2b6→H1b5∧P1b5,
+     H1b5→H0b4∧P1b4,
+     Sb6,
+     Sb6→H3b6,
+     H3b6→H2b5∧P2b5,
+     H2b5→H1b4∧P2b4,
+     H1b4→H0b3∧P1b3,
+     (H0b4∧P1b4)→C 
+     ⊢ Sb6→¬C 
+IS
+NEXTGOAL
+END
+CONJECTUREPANEL Quiz
+CURRENTPROOF "Sa6, Sa6→H1a6, H1a6→H0a5∧P1a5, H0a5∧P1a5∧¬P0b2→C ⊢ Sa1→C"
+INFER Sa6,
+     Sa6→H1a6,
+     H1a6→H0a5∧P1a5,
+     H0a5∧P1a5∧¬P0b2→C 
+     ⊢ Sa1→C 
+IS
+NEXTGOAL
+END
+CONJECTUREPANEL Quiz
+CURRENTPROOF "Sa4, Sa4→H3a3, H3a3→H2a2∧P1a2, H2a2→H1a1∧P1a1, H1a1→H0a0∧P1a0, H0a0→A ⊢ Sa3→A"
+INFER Sa4,
+     Sa4→H3a3,
+     H3a3→H2a2∧P1a2,
+     H2a2→H1a1∧P1a1,
+     H1a1→H0a0∧P1a0,
+     H0a0→A 
+     ⊢ Sa3→A 
+IS
+NEXTGOAL
+END
