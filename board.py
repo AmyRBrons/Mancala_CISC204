@@ -34,6 +34,6 @@ def buildBoard():
     player26 = player25range - player25
     
     # set board
-    Board = [[player1store,pit1,pit2,pit3,pit4,pit5,pit6],[player21,player22,player23,player24,player25range,player26,player2store]]
+    Board = [[player1store,pit1,pit2,pit3,pit4,pit5,pit6],[player2store,player21,player22,player23,player24,player25range,player26]]
     return Board
 
