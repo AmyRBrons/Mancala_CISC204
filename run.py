@@ -3,6 +3,10 @@ from sqlite3 import Row
 from bauhaus import Encoding, proposition, constraint
 from bauhaus.utils import count_solutions, likelihood
 from board import buildBoard
+from resolver import PitisEmpty as Empty
+from resolver import GemsinPit as Gems
+from resolver import CanCollect as Collect
+from resolver import NextTurn as Next
 
 # Encoding that will store all of your constraints
 E = Encoding()
@@ -196,18 +200,42 @@ def constraints():
         # Put the final state of the board in the logic.
         for PitRow in ROW:
             for PitColumn in COLUMN:
-                Pit.append(PitProposition(PitRow,PitColumn,newGemList[PitRow-1][PitColumn]))
+                Pit.append(PitProposition(PitRow,PitColumn,newGemList[PitRow][PitColumn]))
         constraint.add_implies_all(E, SelectPit(player, column), Pit)
-            
 
     # Simulate the game rule: if the final seed lands on the player's store, that person may get another turn.
-    for gems in GEMS:
-        E.add_constraint(FinalSeed(player, 0) >> A)
+    E.add_constraint(FinalSeed(player, 0) >> A)
     # Simulate the game rule: if the final seed lands on an empty pit, the player collects gems from opposite pits.
     for row in ROW:
         for column in COLUMN:
             if column != 0:
                 E.add_constraint(FinalSeed(row,column) & PitProposition(row,column,1) >> C)
+
+    """
+    Configuration related-constraints
+    """
+    # Pit related constraint
+    PitConfig = {}
+    for (row,column,gem) in PitConfig:
+        E.add_constraint(PitProposition(row,column,gem))
+        
+    NotPitConfig = {}
+    for (row,column,gem) in NotPitConfig:
+        E.add_constraint(~PitProposition(row,column,gem))
+
+    # Check for next turn
+    NextTurn = True
+    if (NextTurn):
+        E.add_constraint(PlayerTurnNext())
+    else:
+        E.add_constraint(~PlayerTurnNext())
+
+    # Check for collection
+    CanCollect = True
+    if (CanCollect):
+        E.add_constraint(PlayerCollects())
+    else:
+        E.add_constraint(~PlayerCollects())
 
     return E
 
