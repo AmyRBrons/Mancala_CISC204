@@ -9,7 +9,7 @@ E = Encoding()
 
 # Creative Variables
 GEMS = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24} # Note: we should probably add a limit of 24 gems
-ROW = {1,2}
+ROW = {0,1}
 COLUMN = {0,1,2,3,4,5,6}
 PIT = [COLUMN,COLUMN]
 COLLECTS = TRUE
@@ -192,13 +192,16 @@ def constraints():
         for PitRow in ROW:
             for PitColumn in COLUMN:
                 Pit.append(PitProposition(PitRow,PitColumn,newGemList[PitRow-1][PitColumn]))
+        constraint.add_implies_all(E, SelectPit(player, column), Pit)
             
 
     # Simulate the game rule: if the final seed lands on the player's store, that person may get another turn.
     for gems in GEMS:
-        E.add_constraint(A >> FinalSeed(player+1, 0))
+        E.add_constraint(FinalSeed(player, 0) >> A)
     # Simulate the game rule: if the final seed lands on an empty pit, the player collects gems from opposite pits.
-    constraint.add_exactly_one(E, [C >> FinalSeed(row,column) & PitProposition(row,column,1) for row in ROW for column in COLUMN])
+    for row in ROW:
+        for column in COLUMN:
+            E.add_constraint(FinalSeed(row,column) & PitProposition(row,column,1) >> C)
 
     return E
 
