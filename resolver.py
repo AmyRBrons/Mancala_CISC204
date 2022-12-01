@@ -44,6 +44,7 @@ def CanCollect(Board,Col,Row):
     else:
         return False
 
+
 # Function to determine if the final piece lands in the player store
 def finalStore(board, player,n):
     gemsHand = board[player][n]
@@ -80,9 +81,12 @@ def finalStore(board, player,n):
 # function to determin if opponent can be blocked      
 #def blockOpp(board): -> Return Boolean
 
-# function to determin where last seed lands 
-# def landingPlaceRow -> Returns Row
-# def LandingPlaceCol -> Returns Col
+# This may need updates once finalstore is finalized
+def NextTurn(board, player,n):
+    if finalStore(Board,player,n):
+        return True
+    else:
+        return False#not your turn
 
 def pitDetermination(board, player):
     #1. Putting the final seed in the player store

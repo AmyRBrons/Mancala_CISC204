@@ -7,6 +7,12 @@ from board import buildBoard
 # Encoding that will store all of your constraints
 E = Encoding()
 
+from resolver import PitisEmpty as Empty
+from resolver import GemsinPit as Gems
+from resolver import CanCollect as Collect
+from resolver import NextTurn as Next
+
+
 # Creative Variables
 GEMS = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24} # Note: we should probably add a limit of 24 gems
 ROW = {1,2}
@@ -53,7 +59,6 @@ for row in ROW:
 @proposition(E)
 class PitProposition:
     def __init__(self, row, column, gems):
-        self.pit = pit
         self.row = row
         self.column = column
         self.gems = gems

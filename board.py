@@ -21,9 +21,10 @@ def buildBoard():
     pit6 = int(input('Please enter the number of gems in pit 6 (please note you only have', 24-pit1-pit2-pit3-pit4, 'gems left)'))
     Board[player][1] = pit6
 
+    #in progress
     # randomly fill player 2 gems
-    player21 = random.randint(0,24)
-    player22range = 24 - player21
+    player21 = random.randint(0,10)
+    runningtot = 24-player21
     player22 = random.randint(0,player22range)
     player23range = player22range-player22
     player23 = random.randint(0,player23range)
