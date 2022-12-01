@@ -201,7 +201,8 @@ def constraints():
     # Simulate the game rule: if the final seed lands on an empty pit, the player collects gems from opposite pits.
     for row in ROW:
         for column in COLUMN:
-            E.add_constraint(FinalSeed(row,column) & PitProposition(row,column,1) >> C)
+            if column != 0:
+                E.add_constraint(FinalSeed(row,column) & PitProposition(row,column,1) >> C)
 
     return E
 
