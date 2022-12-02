@@ -3,17 +3,17 @@ from sqlite3 import Row
 from bauhaus import Encoding, proposition, constraint
 from bauhaus.utils import count_solutions, likelihood
 from board import buildBoard
-from resolver import PitisEmpty as Empty
+from resolver import pitisEmpty as Empty
 from resolver import GemsinPit as Gems
-from resolver import CanCollect as Collect
+from resolver import canCollect as Collect
 from resolver import NextTurn as Next
 
 # Encoding that will store all of your constraints
 E = Encoding()
 
-from resolver import PitisEmpty as Empty
+from resolver import pitisEmpty as Empty
 from resolver import GemsinPit as Gems
-from resolver import CanCollect as Collect
+from resolver import canCollect as Collect
 from resolver import NextTurn as Next
 
 
