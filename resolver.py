@@ -4,7 +4,6 @@ from board import buildBoard
 # Set the board
 board = buildBoard()
 
-
 # Set the player to the first player spot
 def playerSet(Board):
     playerRow = Board[1]
@@ -68,6 +67,7 @@ def finalStore(board, n):
 
 # Determines if player A can block player B from depositing their final seed in their store
 def blockOpp(board, n):
+
     # Greater than value
     for i in range(1, 7):
         if board[0][i] != 0 and board[0][i] == i:  # Testing if player B can deposit a final seed in their store
@@ -108,4 +108,5 @@ print(' ', *board[0][1:7])
 print(board[0][0], '            ', board[1][6])
 print(' ', *board[1][0:6])
 
-print(pitDetermination(board))
+
+pitDetermination(board)
