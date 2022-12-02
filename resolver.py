@@ -1,116 +1,120 @@
 # Resolver file to play one round, small module functions per step/ action
 from board import buildBoard
 
-# TO DO on this file:
-# landing place row and col functions
-# Kate to fininsh the pitdetermination function
-# blockopp function
+# Set the board
+board = buildBoard()
 
-# set the board
-Board = buildBoard()
 
 # Set the player to the first player spot
-def PlayerSet(Board):
-    playerRow = Board[0]
+def playerSet(Board):
+    playerRow = Board[1]
     return playerRow # returns list of payer pits, ie: [store, 1,2,3,4,5,6]
 
-# Determine gems in pit
-def GemsinPit(Board, Row, Col):
-    for Row in Board:
-        for Col in Row:
-            return Board[Row][Col]
 
-# Detect if pit is empty
-def PitisEmpty(Board, Row, Col):
-    if GemsinPit(Board,Row,Col)== 0:
+# Determines the number of gems in a pit
+def GemsinPit(board, row, col):
+    for row in board:
+        for col in row:
+            return board[row][col]
+
+
+# Detects if a pit is empty
+def pitIsEmpty(board, n):
+    if GemsinPit(board, 1, n) == 0:
         return True
     else:
         return False
 
-# Detect if opposite pit is empty
-def oppEmpty(Board, Col):
-    playerRow = PlayerSet(Board)
-    oppRow = playerRow+1 # this is for possible changes, as opposed to just putting 1, more flexible
-    if PitisEmpty(Board,oppRow,Col) == True:
+
+# Detects if the opposite pit is empty
+def oppEmpty(board, n):
+    if pitIsEmpty(board, 0, n+1) == True:
         return True
-    else: 
+    else:
         return False
 
-# If the player can collect, return true
-def CanCollect(Board,Col,Row):
+
+# Determines if the player can collect seeds from the opposite pit
+def canCollect(board, n):
     # If the pit is empty and the opposite is not, return true
-    if (PitisEmpty(Board,Col,Row)==True) and (oppEmpty(Board,Col)==False):
+    if (pitIsEmpty(board, n) == True) and (oppEmpty(board, n) == False):
         return True
     else:
         return False
 
 
-# Function to determine if the final piece lands in the player store
-def finalStore(board, player,n):
-    gemsHand = board[player][n]
-    point = n
-    if (gemsHand>1) and (point != -1):
-        if player == 0:
-            point-=1
-            board[player][point] +=1
-            gemsHand-=1
-        if player == 1:
-            point +=1
-            board[player][point] +=1
-            gemsHand-=1
-    
-    elif (gemsHand>1) and((player == 1 and point == -1) or (player==0 and point == 0)):
-        if player == 1:
-            board[player][point]+=1
-            gemsHand-=1
-            player-=1
-        else:
-            player+=1
-            board[player][point]+=1
-            gemsHand-=1
-    elif (gemsHand == 1) and ((player == 1 and point == -1) or (player == 0 and point ==0)):
-        if player==1:
-            gemsHand-=1
+# Determines if the player can collect seeds from the opposite pit
+def collectOpp(board, n):
+    if board[1][n] == 0 and board[0][n+1] != 0:
+        for i in range(6):
+            if i == n:
+                continue
+            if board[1][i] == n-i:
+                return True
+            # Needs >6 gem implementation
+
+
+# Determines if the final gem of a given pit will land in player A's store
+def finalStore(board, n):
+    if board[1][n] != 0:  # Pit cannot be empty
+        maxGemsToStore = 19-n  # Need 19 gems to get from furthest pit to store
+        if board[1][n] == 6-n:
+            return True
+        elif maxGemsToStore == board[1][n]:  # Maximum number of gems needed to iterate around the board once
             return True
         else:
-            gemsHand-=1
-            return True
-    else:
-        return False
+            return False
 
-# function to determin if opponent can be blocked      
-#def blockOpp(board): -> Return Boolean
 
-# This may need updates once finalstore is finalized
-def NextTurn(board, player,n):
-    if finalStore(Board,player,n):
-        return True
-    else:
-        return False#not your turn
+# Determines if player A can block player B from depositing their final seed in their store
+def blockOpp(board, n):
+    for i in range(1, 7):
+        if board[0][i] != 0:
+            if board[0][i] == i:  # Testing if player B can deposit a final seed in their store
+                if board[1][n] >= 12:  # Testing if player A has the minimum number of seeds needed to block
+                    if board[1][n] == (6-n) + (7-i):
+                        return True
 
-def pitDetermination(board, player):
-    #1. Putting the final seed in the player store
-    #2. Block the opponent from putting a seed in there store
-    #3. Put the player seed in the opponents empty pit
-    #4. Empty the player pit
-    #5. If all else fails, play the righmost pit.
 
-    row = landingPlaceRow(Board,player)
-    col = landingPlaceCol(Board,player)
+def pitDetermination(board):
+    # Need to reconfigure to assign dictionary values
+    moveRecommendation = { 
+        "pit1A": '',
+        "pit2A": '',
+        "pit3A": '',
+        "pit4A": '',
+        "pit5A": '',
+        "pit6A": '',
+    }
 
-    for player in board:
-        for n in player:
-            if finalStore(board,n) == True:
-                return n
-            elif blockOpp(board, n) == True:
-                return n 
-            elif (row == 1) and (PitisEmpty(board, row, col) == True):
-                return n
-            elif CanCollect(Board,n,row) == True:
-                return n
-        else:
-            return 6
+    print("\nYour recommended move is:")
+    for i in range(6):
+        if finalStore(board, i) == True:     # 1. Putting the final seed in the player store
+            print("Move the seeds in pit", 6-i,  "to get another turn")
+            break
+        elif blockOpp(board, i) == True:    # 2. Block the opponent from putting a seed in there store
+            print("Move the seeds in pit", 6-i, "to prevent your opponent from getting another turn")
+            break
+        elif collectOpp(board, i) == True:  # 3. Put the player seed in the opponents empty pit
+            print("Move the seeds in pit", 7-i, "to collect the seeds from your opponent's pit")
+            break
+        # Working on functions 
+        # elif canCollect(board, i) == True:  # 4. Empty the player pit
+          # print("Move the seeds in pit", 6-i, "to empty your pit")
 
-def UserChoice():
-    # in traditional set up, 48 stones are used. ie 24 per player, 6 per pit
-    print("Player 1, it is suggested you grab from pit", pitDetermination(Board))
+
+# print("You have no optimal moves. Play the right most pit.")  # 5. If all else fails, play the right most pit.
+
+
+# Dictionary - need a certain pit to have a certain # of gems
+# Check if it doesn't have the original configuration
+# What state a pit needs to be in
+# Checks if you can get next turn
+# Collect
+
+# Printing the randomized Mancala board
+print(' ', *board[0][1:7])
+print(board[0][0], '            ', board[1][6])
+print(' ', *board[1][0:6])
+
+pitDetermination(board)
