@@ -1,0 +1,140 @@
+﻿CONJECTUREPANEL Quiz
+PROOF "(Fa4∧P1a4→C), (Fa1∧P1a1→C), Sa5→(P1a4∧P0a5∧P1b3∧P1a2∧P1a1∧Fa4), Sa2→(P1a5∧P0a4∧P1b3∧P0a2∧P2a1∧Fa1), Sa1→P1a5∧P0a4∧P1b3∧P1a2∧P0a1∧P1a0∧Fa0 ⊢ (Sa1→C)∨(Sa2→C)∨(Sa5→C)"
+INFER (Fa4∧P1a4→C),
+     (Fa1∧P1a1→C),
+     Sa5→(P1a4∧P0a5∧P1b3∧P1a2∧P1a1∧Fa4),
+     Sa2→(P1a5∧P0a4∧P1b3∧P0a2∧P2a1∧Fa1),
+     Sa1→P1a5∧P0a4∧P1b3∧P1a2∧P0a1∧P1a0∧Fa0 
+     ⊢ (Sa1→C)∨(Sa2→C)∨(Sa5→C)
+FORMULAE
+0 Sa5→C,
+1 (Sa1→C)∨(Sa2→C),
+2 C,
+3 Fa4∧P1a4,
+4 Fa4∧P1a4→C,
+5 P1a4,
+6 Fa4,
+7 P1a4∧P0a5∧P1b3∧P1a2∧P1a1∧Fa4,
+8 P1a4∧P0a5∧P1b3∧P1a2∧P1a1,
+9 P1a4∧P0a5,
+10 P0a5,
+11 P1a4∧P0a5∧P1b3,
+12 P1b3,
+13 P1a4∧P0a5∧P1b3∧P1a2,
+14 P1a2,
+15 P1a1,
+16 Sa5,
+17 Sa5→P1a4∧P0a5∧P1b3∧P1a2∧P1a1∧Fa4,
+18 (Sa1→C)∨(Sa2→C)∨(Sa5→C),
+19 Sa2→(P1a5∧P0a4∧P1b3∧P0a2∧P2a1∧Fa1),
+20 Sa1→P1a5∧P0a4∧P1b3∧P1a2∧P0a1∧P1a0∧Fa0,
+21 Fa1∧P1a1→C,
+22 Sa5→(P1a4∧P0a5∧P1b3∧P1a2∧P1a1∧Fa4)
+IS
+SEQ (cut[B,C\0,18]) ("→ intro"[A,B\16,2]) (cut[B,C\7,2]) ("→ elim"[A,B\16,7]) (hyp[A\17]) (hyp[A\16]) (cut[B,C\8,2]) (LAYOUT "∧ elim" (0) ("∧ elim(L)"[A,B\8,6]) (hyp[A\7])) (cut[B,C\13,2]) (LAYOUT "∧ elim" (0) ("∧ elim(L)"[A,B\13,15]) (hyp[A\8])) (cut[B,C\11,2]) (LAYOUT "∧ elim" (0) ("∧ elim(L)"[A,B\11,14]) (hyp[A\13])) (cut[B,C\9,2]) (LAYOUT "∧ elim" (0) ("∧ elim(L)"[A,B\9,12]) (hyp[A\11])) (cut[B,C\5,2]) (LAYOUT "∧ elim" (0) ("∧ elim(L)"[A,B\5,10]) (hyp[A\9])) (cut[B,C\6,2]) (LAYOUT "∧ elim" (0) ("∧ elim(R)"[A,B\8,6]) (hyp[A\7])) (cut[B,C\3,2]) ("∧ intro"[A,B\6,5]) (hyp[A\6]) (hyp[A\5]) (cut[B,C\2,2]) ("→ elim"[A,B\3,2]) (hyp[A\4]) (hyp[A\3]) (hyp[A\2]) (LAYOUT "∨ intro" (0) ("∨ intro(R)"[B,A\1,0]) (hyp[A\0]))
+END
+CONJECTUREPANEL Quiz
+PROOF "Sa1→(P1a0∧P2b6∧P1b5∧P1b4∧P0a1∧P1b3∧¬P0b4) ⊢ Sa1→(P0b4∧Fb4→¬C)"
+INFER Sa1→(P1a0∧P2b6∧P1b5∧P1b4∧P0a1∧P1b3∧¬P0b4)
+     ⊢ Sa1→(P0b4∧Fb4→¬C)
+FORMULAE
+0 ⊥,
+1 ¬C,
+2 ¬P0b4,
+3 P0b4,
+4 P0b4∧Fb4,
+5 Fb4,
+6 P1a0∧P2b6∧P1b5∧P1b4∧P0a1∧P1b3∧¬P0b4,
+7 P1a0∧P2b6∧P1b5∧P1b4∧P0a1∧P1b3,
+8 P0b4∧Fb4→¬C,
+9 Sa1,
+10 Sa1→P1a0∧P2b6∧P1b5∧P1b4∧P0a1∧P1b3∧¬P0b4,
+11 Sa1→(P1a0∧P2b6∧P1b5∧P1b4∧P0a1∧P1b3∧¬P0b4)
+IS
+SEQ ("→ intro"[A,B\9,8]) (cut[B,C\6,8]) ("→ elim"[A,B\9,6]) (hyp[A\10]) (hyp[A\9]) (cut[B,C\2,8]) (LAYOUT "∧ elim" (0) ("∧ elim(R)"[A,B\7,2]) (hyp[A\6])) ("→ intro"[A,B\4,1]) (cut[B,C\3,1]) (LAYOUT "∧ elim" (0) ("∧ elim(L)"[A,B\3,5]) (hyp[A\4])) (cut[B,C\0,1]) ("¬ elim"[B\3]) (hyp[A\3]) (hyp[A\2]) ("contra (constructive)"[B\1]) (hyp[A\0])
+END
+CONJECTUREPANEL Theorems
+PROOF "¬¬P ⊢ P"
+INFER ¬¬P 
+     ⊢ P 
+FORMULAE
+0 ⊥,
+1 ¬¬P,
+2 ¬P,
+3 P 
+IS
+SEQ ("contra (classical)"[A\3]) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL Theorems
+PROOF "P→Q ⊢ ¬Q→¬P"
+INFER P→Q 
+     ⊢ ¬Q→¬P 
+FORMULAE
+0 ⊥,
+1 ¬Q,
+2 Q,
+3 P,
+4 P→Q,
+5 ¬P 
+IS
+SEQ ("→ intro"[A,B\1,5]) ("¬ intro"[A\3]) (cut[B,C\2,0]) ("→ elim"[A,B\3,2]) (hyp[A\4]) (hyp[A\3]) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL Theorems
+PROOF "P→Q, ¬Q ⊢ ¬P"
+INFER P→Q,
+     ¬Q 
+     ⊢ ¬P 
+FORMULAE
+0 ⊥,
+1 ¬Q,
+2 Q,
+3 P,
+4 P→Q 
+IS
+SEQ ("¬ intro"[A\3]) (cut[B,C\2,0]) ("→ elim"[A,B\3,2]) (hyp[A\4]) (hyp[A\3]) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL Theorems
+PROOF "P∨¬P"
+INFER P∨¬P 
+FORMULAE
+0 ⊥,
+1 ¬(P∨¬P),
+2 P∨¬P,
+3 P,
+4 ¬P,
+5 ¬(P∨¬P)
+IS
+SEQ ("contra (classical)"[A\2]) (cut[B,C\3,0]) ("contra (classical)"[A\3]) (cut[B,C\2,0]) (LAYOUT "∨ intro" (0) ("∨ intro(R)"[B,A\3,4]) (hyp[A\4])) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0]) (cut[B,C\2,0]) (LAYOUT "∨ intro" (0) ("∨ intro(L)"[B,A\4,3]) (hyp[A\3])) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL Theorems
+PROOF "P ⊢ ¬¬P"
+INFER P 
+     ⊢ ¬¬P 
+FORMULAE
+0 ⊥,
+1 ¬P,
+2 P 
+IS
+SEQ ("¬ intro"[A\1]) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL Quiz
+PROOF "Sa1→P1a0∧P2a1∧P0a2∧Fa0, Sa2→P1a0∧P0a1∧P2a2∧Fa0, Fa0→A ⊢ (Sa1→A)∨(Sa2→A)"
+INFER Sa1→P1a0∧P2a1∧P0a2∧Fa0,
+     Sa2→P1a0∧P0a1∧P2a2∧Fa0,
+     Fa0→A 
+     ⊢ (Sa1→A)∨(Sa2→A)
+FORMULAE
+0 Sa1→A,
+1 Sa2→A,
+2 A,
+3 Fa0,
+4 Fa0→A,
+5 P1a0∧P2a1∧P0a2∧Fa0,
+6 P1a0∧P2a1∧P0a2,
+7 Sa1,
+8 Sa1→P1a0∧P2a1∧P0a2∧Fa0,
+9 (Sa1→A)∨(Sa2→A),
+10 Sa2→P1a0∧P0a1∧P2a2∧Fa0 
+IS
+SEQ (cut[B,C\0,9]) ("→ intro"[A,B\7,2]) (cut[B,C\5,2]) ("→ elim"[A,B\7,5]) (hyp[A\8]) (hyp[A\7]) (cut[B,C\3,2]) (LAYOUT "∧ elim" (0) ("∧ elim(R)"[A,B\6,3]) (hyp[A\5])) (cut[B,C\2,2]) ("→ elim"[A,B\3,2]) (hyp[A\4]) (hyp[A\3]) (hyp[A\2]) (LAYOUT "∨ intro" (0) ("∨ intro(L)"[B,A\1,0]) (hyp[A\0]))
+END
