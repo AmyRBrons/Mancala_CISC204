@@ -76,29 +76,39 @@ def blockOpp(board, n):
 
 
 def pitDetermination(board):
-    neededValues = [0, 0, 0, 0, 0, 0]
-    for i in range(6):
-        if finalStore(board, i):     # 1. Putting the final seed in the player store
-            neededValues.insert(i, board[1][i])
-            continue
-        elif blockOpp(board, i):    # 2. Block the opponent from putting a seed in there store
-            neededValues.insert(i, board[1][i])
-            continue
-        elif collectOpp(board, i):  # 3. Put the player seed in the opponents empty pit
-            neededValues.insert(i, board[1][i])
-            continue
-        # Consider eliminating
-        #  elif canCollect(board, i) == True:  # 4. Empty the player pit
-            #  print("Move the seeds in pit", 6-i, "to empty your pit")
-
-    moveRecommendation = {
-        "pit1A": neededValues[5],
-        "pit2A": neededValues[4],
-        "pit3A": neededValues[3],
-        "pit4A": neededValues[2],
-        "pit5A": neededValues[1],
-        "pit6A": neededValues[0],
+    moveRecommendation = { 
+        "pit1A": '',
+        "pit2A": '',
+        "pit3A": '',
+        "pit4A": '',
+        "pit5A": '',
+        "pit6A": '',
     }
+
+    print("\nYour recommended move is:")
+    for i in range(6):
+        if finalStore(board, i) == True:     # 1. Putting the final seed in the player store
+            print("Move the seeds in pit", 6-i,  "to get another turn")
+            break
+        elif blockOpp(board, i) == True:    # 2. Block the opponent from putting a seed in there store
+            print("Move the seeds in pit", 6-i, "to prevent your opponent from getting another turn")
+            break
+        elif collectOpp(board, i) == True:  # 3. Put the player seed in the opponents empty pit
+            print("Move the seeds in pit", 7-i, "to collect the seeds from your opponent's pit")
+            break
+        # Working on functions 
+        # elif canCollect(board, i) == True:  # 4. Empty the player pit
+          # print("Move the seeds in pit", 6-i, "to empty your pit")
+
+
+# print("You have no optimal moves. Play the right most pit.")  # 5. If all else fails, play the right most pit.
+
+
+# Dictionary - need a certain pit to have a certain # of gems
+# Check if it doesn't have the original configuration
+# What state a pit needs to be in
+# Checks if you can get next turn
+# Collect
 
     return moveRecommendation
 
