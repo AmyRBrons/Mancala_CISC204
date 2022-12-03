@@ -105,5 +105,3 @@ def pitDetermination(board):
 print(' ', *board[0][1:7])
 print(board[0][0], '            ', board[1][6])
 print(' ', *board[1][0:6])
-
-print(pitDetermination(board))
