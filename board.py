@@ -39,8 +39,8 @@ def buildBoard():
     return board
 
 
-# Using fully randomized board for testing purposes
-# Give the user allowance to fill pits with stones
+# Although we are using a filled and randomized board for this project, in an interactive program, the user would choose 
+# the gem droppings.
 #pit1 = int(input('Please enter the number of gems in pit 1 (please note you only have 24 gems to split between these 6 pits.)'))
 #Board[player][1] = pit1
 #pit2 = int(input('Please enter the number of gems in pit 2 (please note you only have', 24-pit1,'gems left)'))
