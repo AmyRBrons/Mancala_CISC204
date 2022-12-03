@@ -3,18 +3,18 @@ from sqlite3 import Row
 from bauhaus import Encoding, proposition, constraint
 from bauhaus.utils import count_solutions, likelihood
 from board import buildBoard
-from resolver import pitisEmpty as Empty
+from resolver import pitIsEmpty as Empty
 from resolver import GemsinPit as Gems
 from resolver import canCollect as Collect
-from resolver import NextTurn as Next
+#from resolver import NextTurn as Next
 
 # Encoding that will store all of your constraints
 E = Encoding()
 
-from resolver import pitisEmpty as Empty
+from resolver import pitIsEmpty as Empty
 from resolver import GemsinPit as Gems
 from resolver import canCollect as Collect
-from resolver import NextTurn as Next
+#from resolver import NextTurn as Next
 
 
 # Creative Variables
@@ -99,10 +99,9 @@ class PlayerCollects:
     def __repr__(self):
         return f"{self.collects}={self.gems!=0}"
 
-for pit in PIT:
-    for row in ROW:
-        for column in COLUMN:
-            PROPOSITIONS.append(PlayerCollects(pit,row))
+for collects in COLLECTS:
+    for gems in GEMS:
+        PROPOSITIONS.append(PlayerCollects(collects,gems))
 
 # Propositon to determine if the two pits are opposite   
 @proposition(E)
