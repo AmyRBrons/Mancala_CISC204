@@ -77,7 +77,8 @@ class PlayerTurnNext:
         self = self
     def __repr__(self):
         return f"PlayerTurnNext"
-
+    
+PROPOSITIONS.append(PlayerTurnNext())
 
 # Proposition to determine if the player collects gems
 @proposition(E)
@@ -86,23 +87,9 @@ class PlayerCollects:
         pass
 
     def __repr__(self):
-        return f"PlayerCollect"
-
-# Propositon to determine if the two pits are opposite   
-@proposition(E)
-class OppositePits:
-    def __init__(self, row, column, opposite):
-        self.row = row
-        self.column = column
-        self.opposite = opposite
+        return f"PlayerCollects"
     
-    def __repr__(self):
-        return f"{self.column}@{self.row+1}={7 - self.column}@{self.row}={self.opposite}"
-
-for row in ROW:
-    for column in COLUMN:
-        opposite = OPPOSITE
-        PROPOSITIONS.append(OppositePits(row, column, opposite))
+PROPOSITIONS.append(PlayerCollects())
 
 # Call your variables whatever you want
 # Note: This is a 2d array which overlay the position. It goes like this:[[a0,a1,a2,a3,a4,a5,a6][b1,b2,b3,b4,b5,b6]] or b[r][c]
@@ -125,7 +112,7 @@ def constraints():
     # Pit can only have a fixed number of gems.
     for row in ROW:
         for column in COLUMN:
-            constraint.add_exactly_one(E, [PitProposition(row, column, 0) & PitProposition(row, column, 1) & PitProposition(row, column, 2) & PitProposition(row, column, 3) & PitProposition(row, column, 4) & PitProposition(row, column, 5) & PitProposition(row, column, 6) & PitProposition(row, column, 7) & PitProposition(row, column, 8) & PitProposition(row, column, 9) & PitProposition(row, column, 10) & PitProposition(row, column, 11) & PitProposition(row, column, 12) & PitProposition(row, column, 13) & PitProposition(row, column, 14) & PitProposition(row, column, 15) & PitProposition(row, column, 16) & PitProposition(row, column, 17) & PitProposition(row, column, 18) & PitProposition(row, column, 19) & PitProposition(row, column, 20) & PitProposition(row, column, 21) & PitProposition(row, column, 22) & PitProposition(row, column, 23) & PitProposition(row, column, 24)])
+            constraint.exactly_one(PitProposition(row, column, 0) & PitProposition(row, column, 1) & PitProposition(row, column, 2) & PitProposition(row, column, 3) & PitProposition(row, column, 4) & PitProposition(row, column, 5) & PitProposition(row, column, 6) & PitProposition(row, column, 7) & PitProposition(row, column, 8) & PitProposition(row, column, 9) & PitProposition(row, column, 10) & PitProposition(row, column, 11) & PitProposition(row, column, 12) & PitProposition(row, column, 13) & PitProposition(row, column, 14) & PitProposition(row, column, 15) & PitProposition(row, column, 16) & PitProposition(row, column, 17) & PitProposition(row, column, 18) & PitProposition(row, column, 19) & PitProposition(row, column, 20) & PitProposition(row, column, 21) & PitProposition(row, column, 22) & PitProposition(row, column, 23) & PitProposition(row, column, 24))
     # Check which pit is opposite to each other (Comment: I have no idea for any good application, so maybe when its appropriate, I will figure out the constraint)
     # E.add_constraint(E, OppositePits())
 
@@ -168,7 +155,6 @@ def constraints():
         for column in COLUMN:
             if column != 0:
                 E.add_constraint((FinalSeed(row,column) & PitProposition(row,column,1)) >> PlayerCollects())
-    return E
     """
     Configuration related-constraints
     """
@@ -187,7 +173,7 @@ def constraints():
         E.add_constraint(PlayerTurnNext())
     else:
         E.add_constraint(~PlayerTurnNext())
-
+    return E
     # Check for collection
 '''
     CanCollect = True
@@ -207,12 +193,13 @@ if __name__ == "__main__":
     # After compilation (and only after), you can check some of the properties
     # of your model:
     print("\nSatisfiable: %s" % T.satisfiable())
+    # print(count_solutions(T))
     print("   Solution: %s" % T.solve())
-    print("\nVariable likelihoods:")
-    for v,vn in zip([], 'hspxyz'):
+    #print("\nVariable likelihoods:")
+    #for v,vn in zip([], 'hspxyz'):
         # Ensure that you only send these functions NNF formulas
         # Literals are compiled to NNF here
         #print(" %s: %.2f" % (vn, likelihood(T, v)))
-        print(" %s: %f" % (vn, likelihood(T, v)))
+        #print(" %s: %f" % (vn, likelihood(T, v)))
         
     print()
