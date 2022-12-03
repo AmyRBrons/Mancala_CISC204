@@ -2,7 +2,7 @@ from pickle import TRUE
 from sqlite3 import Row
 from bauhaus import Encoding, proposition, constraint
 from bauhaus.utils import count_solutions, likelihood
-from Board import buildBoard
+from board import buildBoard
 
 #from resolver import NextTurn as Next
 
@@ -22,6 +22,13 @@ OPPOSITE = TRUE
 
 
 PROPOSITIONS = []
+
+"""
+Just a reminder on how it works: The logic has a bunch of propositions and constraints which are not defined. The propositions
+represent various things. The constraint represent the physical and spoken rules of the game. For use of application,
+the various propositions must be forced true using external file or hard-coding it and it should run to check if there
+is a solution.
+"""
 
 
 # Proposition to check the position of the final seed
@@ -76,7 +83,7 @@ class PlayerTurnNext:
     def __init__(self):
         self = self
     def __repr__(self):
-        return f"PlayerTurnNext"
+        return f"A"
 
 
 # Proposition to determine if the player collects gems
@@ -86,7 +93,7 @@ class PlayerCollects:
         pass
 
     def __repr__(self):
-        return f"PlayerCollect"
+        return f"C"
 
 # Propositon to determine if the two pits are opposite   
 @proposition(E)
@@ -114,9 +121,15 @@ finalColumn = 0
 gemCount = 0
 # Variable of the player
 player = 0
-# Special Outcomes
-A = PlayerTurnNext()
-C = PlayerCollects()
+# Selection variables (Expermentational, let's try if we can uses likeilhoods function to get our result)
+'''
+S1 = SelectPit(0, 1)
+S2 = SelectPit(0, 2)
+S3 = SelectPit(0, 3)
+S4 = SelectPit(0, 4)
+S5 = SelectPit(0, 5)
+S6 = SelectPit(0, 6)
+'''
 
 def constraints():
     """
@@ -125,9 +138,7 @@ def constraints():
     # Pit can only have a fixed number of gems.
     for row in ROW:
         for column in COLUMN:
-            constraint.add_exactly_one(E, [PitProposition(row, column, 0) & PitProposition(row, column, 1) & PitProposition(row, column, 2) & PitProposition(row, column, 3) & PitProposition(row, column, 4) & PitProposition(row, column, 5) & PitProposition(row, column, 6) & PitProposition(row, column, 7) & PitProposition(row, column, 8) & PitProposition(row, column, 9) & PitProposition(row, column, 10) & PitProposition(row, column, 11) & PitProposition(row, column, 12) & PitProposition(row, column, 13) & PitProposition(row, column, 14) & PitProposition(row, column, 15) & PitProposition(row, column, 16) & PitProposition(row, column, 17) & PitProposition(row, column, 18) & PitProposition(row, column, 19) & PitProposition(row, column, 20) & PitProposition(row, column, 21) & PitProposition(row, column, 22) & PitProposition(row, column, 23) & PitProposition(row, column, 24)])
-    # Check which pit is opposite to each other (Comment: I have no idea for any good application, so maybe when its appropriate, I will figure out the constraint)
-    # E.add_constraint(E, OppositePits())
+            constraint.add_exactly_one(E, [PitProposition(row, column, 0), PitProposition(row, column, 1), PitProposition(row, column, 2), PitProposition(row, column, 3), PitProposition(row, column, 4), PitProposition(row, column, 5), PitProposition(row, column, 6), PitProposition(row, column, 7), PitProposition(row, column, 8), PitProposition(row, column, 9), PitProposition(row, column, 10), PitProposition(row, column, 11), PitProposition(row, column, 12), PitProposition(row, column, 13), PitProposition(row, column, 14), PitProposition(row, column, 15), PitProposition(row, column, 16), PitProposition(row, column, 17), PitProposition(row, column, 18), PitProposition(row, column, 19), PitProposition(row, column, 20), PitProposition(row, column, 21), PitProposition(row, column, 22), PitProposition(row, column, 23), PitProposition(row, column, 24)])
 
     """
     All of the game related constraints.
@@ -135,6 +146,8 @@ def constraints():
     # Simulate what happens if you select a pit
     for column in COLUMN:
         if column != 0:
+            # Ensure we can't select an empty pit
+            E.add_constraint(SelectPit(0, column) & ~PitProposition(0, column, 0))
             newGemList = originalGemList.copy()
             finalRow = player
             finalColumn = column
@@ -168,35 +181,26 @@ def constraints():
         for column in COLUMN:
             if column != 0:
                 E.add_constraint((FinalSeed(row,column) & PitProposition(row,column,1)) >> PlayerCollects())
-    return E
+
     """
     Configuration related-constraints
     """
-
-    # Pit related constraint
-    PitConfig = {}
-    for (row,column,gem) in PitConfig:
-        E.add_constraint(PitProposition(row,column,gem))
-        
-    NotPitConfig = {}
-    for (row,column,gem) in NotPitConfig:
-        E.add_constraint(~PitProposition(row,column,gem))
+    # If we want to enable blocking
+    '''
+    for column in COLUMN:
+        if column != 0:
+            E.add_constraint(~PitProposition(1,column,column))
+    '''
     # Check for next turn
-    NextTurn = True
-    if (NextTurn):
-        E.add_constraint(PlayerTurnNext())
-    else:
-        E.add_constraint(~PlayerTurnNext())
+    # E.add_constraint(FinalSeed(0,0) >> PlayerTurnNext())
 
     # Check for collection
-'''
-    CanCollect = True
-    if (CanCollect):
-        E.add_constraint(PlayerCollects())
-    else:
-        E.add_constraint(~PlayerCollects())
-'''
-    
+
+    '''
+    for row in ROW
+        for column in COLUMN:
+            E.add_constraint((FinalSeed(row, column) & PitProposition(row, column, 1)) >> PlayerTurnNext())
+    '''
 
 
 if __name__ == "__main__":
@@ -207,12 +211,20 @@ if __name__ == "__main__":
     # After compilation (and only after), you can check some of the properties
     # of your model:
     print("\nSatisfiable: %s" % T.satisfiable())
-    print("   Solution: %s" % T.solve())
-    print("\nVariable likelihoods:")
-    for v,vn in zip([], 'hspxyz'):
+    # Debugging based on forum suggestion
+    '''
+    sol = T.solve()
+    E.pprint(T, sol)
+    E.introspect(sol)
+    print_theory(sol)
+    '''
+
+    # Debugging based on a experimental suggestion
+    '''
+    for v,vn in zip([S1,S2,S3,S4,S5,S6], '123456'):
         # Ensure that you only send these functions NNF formulas
         # Literals are compiled to NNF here
-        #print(" %s: %.2f" % (vn, likelihood(T, v)))
-        print(" %s: %f" % (vn, likelihood(T, v)))
-        
+        print(" %s: %.2f" % (vn, likelihood(T, v)))
     print()
+
+    '''
