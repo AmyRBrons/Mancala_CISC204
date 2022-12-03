@@ -71,6 +71,26 @@ class PlayerCollects:
     def __repr__(self):
         return f"C"
 
+#TESTING BLOCK STARTS
+"""
+
+#TEST 1: EMPTY BOARD - Should return Error -- Empty pit
+originalGemList = [[0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0]]
+print(originalGemList)
+
+#TEST 2: EVEN BOARD - Should return true
+originalGemList = [[0, 4, 4, 4, 4, 4, 4],
+             [4, 4, 4, 4, 4, 4, 0]]
+print(originalGemList)
+
+#TEST 3: RANDOM BOARD - Should return true
+originalGemList = [[0, 16, 2, 2, 1, 0, 2],
+             [2, 7, 1, 1, 9, 4, 0]]
+print(originalGemList)
+
+#TESTING BLOCK ENDS
+"""
 # Board randomizer
 # Note: This is a 2d array which overlay the position. It goes like this:[[a0,a1,a2,a3,a4,a5,a6][b1,b2,b3,b4,b5,b6]] or b[r][c]
 originalGemList = buildBoard()
@@ -142,7 +162,6 @@ def constraints():
                 for PitColumn in COLUMN:
                     E.add_constraint(SelectPit(0, column) >> PitProposition(PitRow, PitColumn, newGemList[PitRow][PitColumn]))
             E.add_constraint(SelectPit(0,column) >> FinalSeed(finalRow,finalColumn))
-
     # Simulate the game rule: if the final seed lands on the player's store, that person may get another turn.
     E.add_constraint(FinalSeed(0, 0) >> PlayerTurnNext())
     # Simulate the game rule: if the final seed lands on an empty pit, the player collects gems from opposite pits.
@@ -159,8 +178,6 @@ def constraints():
     for column in COLUMN:
         if column != 0:
             E.add_constraint(~PitProposition(1,column,column))
-    """
-    
     # Check for next turn (Uncomment so the logic would check to see if its possible to get another turn)
     # E.add_constraint(FinalSeed(0,0))
 
@@ -176,7 +193,7 @@ if __name__ == "__main__":
     """
     sol = T.solve()
     E.pprint(T, sol)
-    E.introspect(sol)
+   # E.introspect(sol)
     print_theory(sol)
     
 """
