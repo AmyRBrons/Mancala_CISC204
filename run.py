@@ -181,10 +181,10 @@ def constraints():
         for column in COLUMN:
             if column != 0:
                 E.add_constraint((FinalSeed(row,column) & PitProposition(row,column,1)) >> PlayerCollects())
+
     """
     Configuration related-constraints
     """
-
     # If we want to enable blocking
     '''
     for column in COLUMN:
@@ -195,12 +195,12 @@ def constraints():
     # E.add_constraint(FinalSeed(0,0) >> PlayerTurnNext())
 
     # Check for collection
+
     '''
     for row in ROW
         for column in COLUMN:
             E.add_constraint((FinalSeed(row, column) & PitProposition(row, column, 1)) >> PlayerTurnNext())
     '''
-
 
 
 if __name__ == "__main__":

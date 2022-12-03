@@ -1,112 +1,107 @@
 # Resolver file to play one round, small module functions per step/ action
 from board import buildBoard
 
-# TO DO on this file:
-# landing place row and col functions
-# Kate to fininsh the pitdetermination function
-# blockopp function
+# Set the board
+board = buildBoard()
 
-# set the board
-Board = buildBoard()
 
-# Set the player to the first player spot
-def PlayerSet(Board):
-    playerRow = Board[0]
-    return playerRow # returns list of payer pits, ie: [store, 1,2,3,4,5,6]
-
-# Determine gems in pit
-def GemsinPit(Board, Row, Col):
-    for Row in Board:
-        for Col in Row:
-            return Board[Row][Col]
-
-# Detect if pit is empty
-def PitisEmpty(Board, Row, Col):
-    if GemsinPit(Board,Row,Col)== 0:
-        return True
+# Determines if the final gem of a given pit will land in player A's store
+def finalStore(board, n):
+    if board[1][n] == 0:  # Pit cannot be empty
+        return False
     else:
-        return False
-
-# Detect if opposite pit is empty
-def oppEmpty(Board, Col):
-    playerRow = PlayerSet(Board)
-    oppRow = playerRow+1 # this is for possible changes, as opposed to just putting 1, more flexible
-    if PitisEmpty(Board,oppRow,Col) == True:
-        return True
-    else: 
-        return False
-
-# If the player can collect, return true
-def CanCollect(Board,Col,Row):
-    # If the pit is empty and the opposite is not, return true
-    if (PitisEmpty(Board,Col,Row)==True) and (oppEmpty(Board,Col)==False):
-        return True
-    else:
-        return False
-
-# Function to determine if the final piece lands in the player store
-def finalStore(board, player,n):
-    gemsHand = board[player][n]
-    point = n
-    if (gemsHand>1) and (point != -1):
-        if player == 0:
-            point-=1
-            board[player][point] +=1
-            gemsHand-=1
-        if player == 1:
-            point +=1
-            board[player][point] +=1
-            gemsHand-=1
-    
-    elif (gemsHand>1) and((player == 1 and point == -1) or (player==0 and point == 0)):
-        if player == 1:
-            board[player][point]+=1
-            gemsHand-=1
-            player-=1
-        else:
-            player+=1
-            board[player][point]+=1
-            gemsHand-=1
-    elif (gemsHand == 1) and ((player == 1 and point == -1) or (player == 0 and point ==0)):
-        if player==1:
-            gemsHand-=1
+        maxGemsToStore = 19-n  # Need 19 gems to get from furthest pit to store
+        if board[1][n] == 6-n:
+            return True
+        elif maxGemsToStore == board[1][n]:  # Maximum number of gems needed to iterate around the board once
             return True
         else:
-            gemsHand-=1
-            return True
+            return False
+
+
+# Determines if player A can block player B from depositing their final gem in their store
+def blockOpp(board, n):
+    for i in range(1, 7):
+        if board[0][i] != 0 and board[0][i] == i:  # Testing if player B can deposit a final gem in their store
+            if board[1][n] >= (6-n) + (7-i):  # Testing if player A can block
+                return True
+            else:
+                return False
+
+
+# Determines if the player can collect gems from the opposite pit
+def collectOpp(board, n):
+    if board[1][n] == 13 and board[0][n+1] != 0:
+        return True
+    elif board[1][n] == 0 and board[0][n+1] != 0:
+        for i in range(6):
+            if i == n:
+                return False
+            if board[1][i] == n-i:
+                return True
     else:
         return False
 
-# function to determin if opponent can be blocked      
-#def blockOpp(board): -> Return Boolean
 
-# function to determin where last seed lands 
-# def landingPlaceRow -> Returns Row
-# def LandingPlaceCol -> Returns Col
+# Move the gems in the right most non zero pit
+def rightMostPit(board, n):
+    if board[1][n] == 0:
+        return False
+    else:
+        return True
 
-def pitDetermination(board, player):
-    #1. Putting the final seed in the player store
-    #2. Block the opponent from putting a seed in there store
-    #3. Put the player seed in the opponents empty pit
-    #4. Empty the player pit
-    #5. If all else fails, play the righmost pit.
 
-    row = landingPlaceRow(Board,player)
-    col = landingPlaceCol(Board,player)
+# Tests strategies on player's gems. Returns True if strategy works
+def pitDetermination(board):
+    neededValuesFinal = [None, None, None, None, None, None]
+    neededValuesBlock = [None, None, None, None, None, None]
+    neededValuesOpp = [None, None, None, None, None, None]
+    neededValuesRight = [None, None, None, None, None, None]
 
-    for player in board:
-        for n in player:
-            if finalStore(board,n) == True:
-                return n
-            elif blockOpp(board, n) == True:
-                return n 
-            elif (row == 1) and (PitisEmpty(board, row, col) == True):
-                return n
-            elif CanCollect(Board,n,row) == True:
-                return n
-        else:
-            return 6
+    for i in range(6):
+        neededValuesFinal.insert(i, (finalStore(board, i)))  # 1. Putting the final gem in the player store
+        neededValuesBlock.insert(i, (blockOpp(board, i)))   # 2. Block the opponent from putting a gem in there store
+        neededValuesOpp.insert(i, collectOpp(board, i))  # 3. Collect gems from the opposite pit
+        neededValuesRight.insert(i, rightMostPit(board, i))  # 4. Moves right most non-zero gems
 
-def UserChoice():
-    # in traditional set up, 48 stones are used. ie 24 per player, 6 per pit
-    print("Player 1, it is suggested you grab from pit", pitDetermination(Board))
+    finalGemInStore = {
+        "pit1A": [1, 0, neededValuesFinal[0]],
+        "pit2A": [1, 1, neededValuesFinal[1]],
+        "pit3A": [1, 2, neededValuesFinal[2]],
+        "pit4A": [1, 3, neededValuesFinal[3]],
+        "pit5A": [1, 4, neededValuesFinal[4]],
+        "pit6A": [1, 5, neededValuesFinal[5]],
+    }
+
+    blockOpponent = {
+        "pit1A": [1, 0, neededValuesBlock[0]],
+        "pit2A": [1, 1, neededValuesBlock[1]],
+        "pit3A": [1, 2, neededValuesBlock[2]],
+        "pit4A": [1, 3, neededValuesBlock[3]],
+        "pit5A": [1, 4, neededValuesBlock[4]],
+        "pit6A": [1, 5, neededValuesBlock[5]],
+    }
+
+    collectFromOpp = {
+        "pit1A": [1, 0, neededValuesOpp[0]],
+        "pit2A": [1, 1, neededValuesOpp[1]],
+        "pit3A": [1, 2, neededValuesOpp[2]],
+        "pit4A": [1, 3, neededValuesOpp[3]],
+        "pit5A": [1, 4, neededValuesOpp[4]],
+        "pit6A": [1, 5, neededValuesOpp[5]],
+    }
+
+    moveRightGems = {
+        "pit1A": [1, 0, neededValuesRight[0]],
+        "pit2A": [1, 1, neededValuesRight[1]],
+        "pit3A": [1, 2, neededValuesRight[2]],
+        "pit4A": [1, 3, neededValuesRight[3]],
+        "pit5A": [1, 4, neededValuesRight[4]],
+        "pit6A": [1, 5, neededValuesRight[5]],
+    }
+
+
+# Printing the randomized Mancala board
+print(' ', *board[0][1:7])
+print(board[0][0], '            ', board[1][6])
+print(' ', *board[1][0:6])
