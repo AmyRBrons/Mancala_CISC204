@@ -16,7 +16,6 @@ E = Encoding()
 GEMS = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24} # Note: we should probably add a limit of 24 gems
 ROW = {0,1}
 COLUMN = {0,1,2,3,4,5,6}
-PIT = [COLUMN,COLUMN]
 COLLECTS = TRUE
 OPPOSITE = TRUE
 
@@ -56,10 +55,6 @@ class SelectPit:
     
     def __repr__(self):
         return f"selected-{self.column}"
-
-for column in COLUMN:
-    if column != 0:
-        PROPOSITIONS.append(SelectPit(0, column))
 
 # Proposition of the pit and how many gems it contains
 @proposition(E)
@@ -122,6 +117,51 @@ gemCount = 0
 # Variable of the player
 player = 0
 # Selection variables (Expermentational, let's try if we can uses likeilhoods function to get our result)
+for column in COLUMN:
+    if column != 0:
+        PROPOSITIONS.append(SelectPit(0, column))
+
+#TESTING BLOCK STARTS
+
+"""
+#TEST 1: EMPTY BOARD - Should return false
+originalGemList = [[0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0]]
+print(originalGemList)
+finalRow = 0
+finalColumn = 0
+gemCount = 0
+player = 0
+for column in COLUMN:
+    if (column != 0) and (originalGemList[0][column]!=0):
+        PROPOSITIONS.append(SelectPit(0, column))
+
+#TEST2: EVEN BOARD - Should return true
+originalGemList = [[0, 4, 4, 4, 4, 4, 4],
+             [4, 4, 4, 4, 4, 4, 0]]
+print(originalGemList)
+finalRow = 0
+finalColumn = 0
+gemCount = 0
+player = 0
+for column in COLUMN:
+    if column != 0:
+        PROPOSITIONS.append(SelectPit(0, column))
+
+#TEST3: RANDOM BOARD - Should return true
+originalGemList = [[0, 16, 2, 2, 1, 0, 2],
+             [2, 7, 1, 1, 9, 4, 0]]
+print(originalGemList)
+finalRow = 0
+finalColumn = 0
+gemCount = 0
+player = 0
+for column in COLUMN:
+    if column != 0:
+        PROPOSITIONS.append(SelectPit(0, column))
+
+#TESTING BLOCK ENDS
+"""
 '''
 S1 = SelectPit(0, 1)
 S2 = SelectPit(0, 2)
@@ -147,7 +187,7 @@ def constraints():
     for column in COLUMN:
         if column != 0:
             # Ensure we can't select an empty pit
-            E.add_constraint(SelectPit(0, column) & ~PitProposition(0, column, 0))
+            E.add_constraint(SelectPit(0, column) >>(~PitProposition(0, column, 0)))
             newGemList = originalGemList.copy()
             finalRow = player
             finalColumn = column
@@ -173,6 +213,7 @@ def constraints():
             for PitRow in ROW:
                 for PitColumn in COLUMN:
                     E.add_constraint(SelectPit(player, column) >> PitProposition(PitRow, PitColumn, newGemList[PitRow][PitColumn]))
+            E.add_constraint(SelectPit(player,column)>> FinalSeed(finalRow,finalColumn))
 
     # Simulate the game rule: if the final seed lands on the player's store, that person may get another turn.
     E.add_constraint(FinalSeed(player, 0) >> PlayerTurnNext())
@@ -201,7 +242,7 @@ def constraints():
         for column in COLUMN:
             E.add_constraint((FinalSeed(row, column) & PitProposition(row, column, 1)) >> PlayerTurnNext())
     '''
-
+    return E
 
 if __name__ == "__main__":
 
@@ -212,13 +253,13 @@ if __name__ == "__main__":
     # of your model:
     print("\nSatisfiable: %s" % T.satisfiable())
     # Debugging based on forum suggestion
-    '''
+    """
     sol = T.solve()
     E.pprint(T, sol)
-    E.introspect(sol)
+   # E.introspect(sol)
     print_theory(sol)
-    '''
-
+    
+"""
     # Debugging based on a experimental suggestion
     '''
     for v,vn in zip([S1,S2,S3,S4,S5,S6], '123456'):

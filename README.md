@@ -7,7 +7,7 @@ Mancala is a two person ancient boardgame in which players strategically â€˜sowâ
 For our project, we will be modelling the optimal next move for player A, given a randomized board state. 
 
 See board visualization here:
-![Board](../../../Desktop/Screen%20Shot%202022-12-02%20at%208.17.38%20PM.png)
+![Mancala Board](documents/draft/macalavisualization.png)
 
 
 
