@@ -1,109 +1,220 @@
-# Resolver file to play one round, small module functions per step/ action
-from board import buildBoard
+from pickle import TRUE
+from sqlite3 import Row
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+from Board import buildBoard
 
-# Set the board
-board = buildBoard()
+#from resolver import NextTurn as Next
+
+# Encoding that will store all of your constraints
+E = Encoding()
+
+#from resolver import NextTurn as Next
 
 
-# Determines if the final gem of a given pit will land in player A's store
-def finalStore(board, n):
-    if board[1][n] == 0:  # Pit cannot be empty
-        return False
+# Creative Variables
+GEMS = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24} # Note: we should probably add a limit of 24 gems
+ROW = {0,1}
+COLUMN = {0,1,2,3,4,5,6}
+PIT = [COLUMN,COLUMN]
+COLLECTS = TRUE
+OPPOSITE = TRUE
+
+
+PROPOSITIONS = []
+
+
+# Proposition to check the position of the final seed
+@constraint.exactly_one(E)
+@proposition(E)
+class FinalSeed:
+    def __init__(self, row, column):
+        self.row = row
+        self.column = column
+
+    def __repr__(self):
+        return f"{self.row}@{self.column}"
+
+for row in ROW:
+    for column in COLUMN:
+        PROPOSITIONS.append(FinalSeed(row,column))
+
+# Proposition to check which pit is selected
+@constraint.exactly_one(E)
+@proposition(E)
+class SelectPit:
+    def __init__(self, row, column):
+        self.row = row
+        self.column = column
+    
+    def __repr__(self):
+        return f"selected-{self.column}"
+
+for column in COLUMN:
+    if column != 0:
+        PROPOSITIONS.append(SelectPit(0, column))
+
+# Proposition of the pit and how many gems it contains
+@proposition(E)
+class PitProposition:
+    def __init__(self, row, column, gems):
+        self.row = row
+        self.column = column
+        self.gems = gems
+    
+    def __repr__(self):
+        return f"{self.row}@{self.column}={self.gems}"
+
+for row in ROW:
+    for column in COLUMN:
+        for gems in GEMS:
+            PROPOSITIONS.append(PitProposition(row, column, gems))
+
+# Propositon to identify which player gets another turn
+@proposition(E)
+class PlayerTurnNext:
+    def __init__(self):
+        self = self
+    def __repr__(self):
+        return f"PlayerTurnNext"
+
+
+# Proposition to determine if the player collects gems
+@proposition(E)
+class PlayerCollects:
+    def __init__(self):
+        pass
+
+    def __repr__(self):
+        return f"PlayerCollect"
+
+# Propositon to determine if the two pits are opposite   
+@proposition(E)
+class OppositePits:
+    def __init__(self, row, column, opposite):
+        self.row = row
+        self.column = column
+        self.opposite = opposite
+    
+    def __repr__(self):
+        return f"{self.column}@{self.row+1}={7 - self.column}@{self.row}={self.opposite}"
+
+for row in ROW:
+    for column in COLUMN:
+        opposite = OPPOSITE
+        PROPOSITIONS.append(OppositePits(row, column, opposite))
+
+# Call your variables whatever you want
+# Note: This is a 2d array which overlay the position. It goes like this:[[a0,a1,a2,a3,a4,a5,a6][b1,b2,b3,b4,b5,b6]] or b[r][c]
+originalGemList = buildBoard()
+print(originalGemList)
+# Variables of the hand
+finalRow = 0
+finalColumn = 0
+gemCount = 0
+# Variable of the player
+player = 0
+# Special Outcomes
+A = PlayerTurnNext()
+C = PlayerCollects()
+
+def constraints():
+    """
+    All of the board related constraints.
+    """
+    # Pit can only have a fixed number of gems.
+    for row in ROW:
+        for column in COLUMN:
+            constraint.add_exactly_one(E, [PitProposition(row, column, gems) for gems in GEMS])
+    # Check which pit is opposite to each other (Comment: I have no idea for any good application, so maybe when its appropriate, I will figure out the constraint)
+    # E.add_constraint(E, OppositePits())
+
+    """
+    All of the game related constraints.
+    """
+    # Simulate what happens if you select a pit
+    for column in COLUMN:
+        if column != 0:
+            newGemList = originalGemList.copy()
+            finalRow = player
+            finalColumn = column
+            gemCount = originalGemList[finalRow][finalColumn]
+            newGemList[finalRow][finalColumn] = 0
+            while gemCount != 0:
+                # Move the hand to the opponent's row after dropping a gem in the bank
+                if finalColumn == 0 and finalRow == player:
+                    finalColumn = 6
+                    if player == 0:
+                        finalRow = 1
+                    else:
+                        finalRow = 0
+                # Skip the opponent bank
+                elif finalColumn == 1 and finalRow != player:
+                    finalColumn = 6
+                    finalRow = player
+                else:
+                    finalColumn = finalColumn - 1
+                newGemList[finalRow][finalColumn] = newGemList[finalRow][finalColumn] + 1
+                gemCount = gemCount - 1
+            # Put the final state of the board in the logic.
+            for PitRow in ROW:
+                for PitColumn in COLUMN:
+                    E.add_constraint(SelectPit(player, column) >> PitProposition(PitRow, PitColumn, newGemList[PitRow][PitColumn]))
+
+    # Simulate the game rule: if the final seed lands on the player's store, that person may get another turn.
+    E.add_constraint(FinalSeed(player, 0) >> PlayerTurnNext())
+    # Simulate the game rule: if the final seed lands on an empty pit, the player collects gems from opposite pits.
+    for row in ROW:
+        for column in COLUMN:
+            if column != 0:
+                E.add_constraint((FinalSeed(row,column) & PitProposition(row,column,1)) >> PlayerCollects())
+    return E
+    """
+    Configuration related-constraints
+    """
+
+    # Pit related constraint
+    PitConfig = {}
+    for (row,column,gem) in PitConfig:
+        E.add_constraint(PitProposition(row,column,gem))
+        
+    NotPitConfig = {}
+    for (row,column,gem) in NotPitConfig:
+        E.add_constraint(~PitProposition(row,column,gem))
+    # Check for next turn
+    NextTurn = True
+    if (NextTurn):
+        E.add_constraint(PlayerTurnNext())
     else:
-        maxGemsToStore = 19-n  # Need 19 gems to get from furthest pit to store
-        if board[1][n] == 6-n:
-            return True
-        elif maxGemsToStore == board[1][n]:  # Maximum number of gems needed to iterate around the board once
-            return True
-        else:
-            return False
+        E.add_constraint(~PlayerTurnNext())
 
-
-# Determines if player A can block player B from depositing their final gem in their store
-def blockOpp(board, n):
-    for i in range(1, 7):
-        if board[0][i] != 0 and board[0][i] == i:  # Testing if player B can deposit a final gem in their store
-            if board[1][n] >= (6-n) + (7-i):  # Testing if player A can block
-                return True
-            else:
-                return False
-
-
-# Determines if the player can collect gems from the opposite pit
-def collectOpp(board, n):
-    if board[1][n] == 13 and board[0][n+1] != 0:
-        return True
-    elif board[1][n] == 0 and board[0][n+1] != 0:
-        for i in range(6):
-            if i == n:
-                return False
-            if board[1][i] == n-i:
-                return True
+    # Check for collection
+'''
+    CanCollect = True
+    if (CanCollect):
+        E.add_constraint(PlayerCollects())
     else:
-        return False
+        E.add_constraint(~PlayerCollects())
+'''
+    
 
 
-# Move the gems in the right most non zero pit
-def rightMostPit(board, n):
-    if board[1][n] == 0:
-        return False
-    else:
-        return True
+if __name__ == "__main__":
 
-
-# Tests strategies on player's gems. Returns True if strategy works
-def pitDetermination(board):
-    neededValuesFinal = [None, None, None, None, None, None]
-    neededValuesBlock = [None, None, None, None, None, None]
-    neededValuesOpp = [None, None, None, None, None, None]
-    neededValuesRight = [None, None, None, None, None, None]
-
-    for i in range(6):
-        neededValuesFinal.insert(i, (finalStore(board, i)))  # 1. Putting the final gem in the player store
-        neededValuesBlock.insert(i, (blockOpp(board, i)))   # 2. Block the opponent from putting a gem in there store
-        neededValuesOpp.insert(i, collectOpp(board, i))  # 3. Collect gems from the opposite pit
-        neededValuesRight.insert(i, rightMostPit(board, i))  # 4. Moves right most non-zero gems
-
-    finalGemInStore = {
-        "pit1A": [1, 0, neededValuesFinal[0]],
-        "pit2A": [1, 1, neededValuesFinal[1]],
-        "pit3A": [1, 2, neededValuesFinal[2]],
-        "pit4A": [1, 3, neededValuesFinal[3]],
-        "pit5A": [1, 4, neededValuesFinal[4]],
-        "pit6A": [1, 5, neededValuesFinal[5]],
-    }
-
-    blockOpponent = {
-        "pit1A": [1, 0, neededValuesBlock[0]],
-        "pit2A": [1, 1, neededValuesBlock[1]],
-        "pit3A": [1, 2, neededValuesBlock[2]],
-        "pit4A": [1, 3, neededValuesBlock[3]],
-        "pit5A": [1, 4, neededValuesBlock[4]],
-        "pit6A": [1, 5, neededValuesBlock[5]],
-    }
-
-    collectFromOpp = {
-        "pit1A": [1, 0, neededValuesOpp[0]],
-        "pit2A": [1, 1, neededValuesOpp[1]],
-        "pit3A": [1, 2, neededValuesOpp[2]],
-        "pit4A": [1, 3, neededValuesOpp[3]],
-        "pit5A": [1, 4, neededValuesOpp[4]],
-        "pit6A": [1, 5, neededValuesOpp[5]],
-    }
-
-    moveRightGems = {
-        "pit1A": [1, 0, neededValuesRight[0]],
-        "pit2A": [1, 1, neededValuesRight[1]],
-        "pit3A": [1, 2, neededValuesRight[2]],
-        "pit4A": [1, 3, neededValuesRight[3]],
-        "pit5A": [1, 4, neededValuesRight[4]],
-        "pit6A": [1, 5, neededValuesRight[5]],
-    }
-
-
-# Printing the randomized Mancala board
-print(' ', *board[0][1:7])
-print(board[0][0], '            ', board[1][6])
-print(' ', *board[1][0:6])
-
-print(pitDetermination(board))
+    T = constraints()
+    # Don't compile until you're finished adding all your constraints!
+    T = T.compile()
+    # After compilation (and only after), you can check some of the properties
+    # of your model:
+    print("\nSatisfiable: %s" % T.satisfiable())
+    print(count_solutions(T))
+    print("   Solution: %s" % T.solve())
+    # E.introspect()
+    print("\nVariable likelihoods:")
+    for v,vn in zip([], 'hspxyz'):
+        # Ensure that you only send these functions NNF formulas
+        # Literals are compiled to NNF here
+        #print(" %s: %.2f" % (vn, likelihood(T, v)))
+        print(" %s: %f" % (vn, likelihood(T, v)))
+        
+    print()
