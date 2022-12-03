@@ -122,9 +122,9 @@ for column in COLUMN:
         PROPOSITIONS.append(SelectPit(0, column))
 
 #TESTING BLOCK STARTS
-
 """
-#TEST 1: EMPTY BOARD - Should return false
+
+#TEST 1: EMPTY BOARD - Should return Error -- Empty pit
 originalGemList = [[0, 0, 0, 0, 0, 0, 0],
              [0, 0, 0, 0, 0, 0, 0]]
 print(originalGemList)
@@ -135,6 +135,7 @@ player = 0
 for column in COLUMN:
     if (column != 0) and (originalGemList[0][column]!=0):
         PROPOSITIONS.append(SelectPit(0, column))
+
 
 #TEST2: EVEN BOARD - Should return true
 originalGemList = [[0, 4, 4, 4, 4, 4, 4],
@@ -147,6 +148,7 @@ player = 0
 for column in COLUMN:
     if column != 0:
         PROPOSITIONS.append(SelectPit(0, column))
+
 
 #TEST3: RANDOM BOARD - Should return true
 originalGemList = [[0, 16, 2, 2, 1, 0, 2],
@@ -185,7 +187,7 @@ def constraints():
     """
     # Simulate what happens if you select a pit
     for column in COLUMN:
-        if column != 0:
+        if column != 0 and originalGemList[0][column]!=0:
             # Ensure we can't select an empty pit
             E.add_constraint(SelectPit(0, column) >>(~PitProposition(0, column, 0)))
             newGemList = originalGemList.copy()

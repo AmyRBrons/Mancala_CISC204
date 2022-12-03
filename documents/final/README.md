@@ -1,6 +1,5 @@
 # Modelling Project Final Submission
-
-This folder should contain the extra documents for the deliverables (D3) - (D5)
+Included in this folder is the final submissions for our Mancala modelling project. This includes solved Jape logic files and or final report. The final report outlines our project breakdown, process and model exploration.
 
 ## Expected Items
 
