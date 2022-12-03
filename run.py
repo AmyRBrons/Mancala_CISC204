@@ -71,9 +71,15 @@ class PlayerCollects:
     def __repr__(self):
         return f"C"
 
+
+# Board randomizer
+# Note: This is a 2d array which overlay the position. It goes like this:[[a0,a1,a2,a3,a4,a5,a6][b1,b2,b3,b4,b5,b6]] or b[r][c]
+originalGemList = buildBoard()
+print(originalGemList)
+
+
 #TESTING BLOCK STARTS
 """
-
 #TEST 1: EMPTY BOARD - Should return Error -- Empty pit
 originalGemList = [[0, 0, 0, 0, 0, 0, 0],
              [0, 0, 0, 0, 0, 0, 0]]
@@ -89,33 +95,21 @@ originalGemList = [[0, 16, 2, 2, 1, 0, 2],
              [2, 7, 1, 1, 9, 4, 0]]
 print(originalGemList)
 
-#TESTING BLOCK ENDS
-"""
-# Board randomizer
-# Note: This is a 2d array which overlay the position. It goes like this:[[a0,a1,a2,a3,a4,a5,a6][b1,b2,b3,b4,b5,b6]] or b[r][c]
-originalGemList = buildBoard()
-print(originalGemList)
-#TESTING BLOCK STARTS
-
-"""
-#TEST 1: Strategy 1 - Should return true
+#TEST 4: Strategy 1 - Should return false
 originalGemList = [[0, 1, 3, 4, 8, 9, 10],
              [0, 0, 0, 0, 0, 0, 0]]
 print(originalGemList)
-"""
 
-"""
-#TEST2: Should return false
+#TEST 5: Should return true
 originalGemList = [[0, 0, 2, 0, 0, 0, 0],
              [0, 4, 4, 4, 4, 4, 4]]
 print(originalGemList)
-"""
 
-"""
-#TEST3: RANDOM BOARD - Should return false
+#TEST 6: RANDOM BOARD - Should return true
 originalGemList = [[0, 21, 3, 0, 0, 0, 0], [19, 0, 3, 1, 0, 1, 0]]
 print(originalGemList)
 """
+
 #TESTING BLOCK ENDS
 
 def constraints():
@@ -182,7 +176,7 @@ def constraints():
     # E.add_constraint(FinalSeed(0,0))
 
     # Check for collection (Uncomment so the logic would check to see if its possible to collect gems)
-    # E.add_constraint(PlayerCollects())
+    # E.add_constraint(PlayerCollects()) """
     return E
 
 if __name__ == "__main__":
